@@ -1,9 +1,9 @@
 const Product = require('../models/productModel');
 
-// Get all products for the logged-in user
+// Get all products
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({ userId: req.user }); // only user's products
+    const products = await Product.find(); // fetch all products
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -19,7 +19,7 @@ const addProduct = async (req, res) => {
       price,
       quantity,
       unit,
-      userId: req.user, // associate with logged-in user
+      
     });
     await newProduct.save();
     res.status(201).json(newProduct);
@@ -34,8 +34,8 @@ const updateProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const product = await Product.findOneAndUpdate(
-      { _id: id, userId: req.user }, // ensure the product belongs to the user
+    const product = await Product.findByIdAndUpdate(
+      id,
       { name, price, quantity, unit },
       { new: true }
     );
@@ -53,7 +53,7 @@ const deleteProduct = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deleted = await Product.findOneAndDelete({ _id: id, userId: req.user });
+    const deleted = await Product.findByIdAndDelete(id);
 
     if (!deleted) return res.status(404).json({ msg: 'Product not found' });
 

@@ -8,14 +8,11 @@ const {
   updateProduct,
   deleteProduct,
 } = require('../controllers/productController');
-const auth = require('../middleware/auth'); // ✅ Import auth middleware
 
-// Public (optional: make this protected too if needed)
-router.get('/', getProducts);
-
-// Protected routes
-router.post('/',  addProduct);            // ✅ Add Product (auth required)
-router.put('/:id',  updateProduct);       // ✅ Update Product (auth required)
-router.delete('/:id',  deleteProduct);    // ✅ Delete Product (auth required)
+// Public routes (no auth)
+router.get('/', getProducts);           // ✅ Get all products
+router.post('/', addProduct);           // ✅ Add product (no ID in URL)
+router.put('/:id', updateProduct);      // ✅ Update product by ID
+router.delete('/:id', deleteProduct);   // ✅ Delete product by ID
 
 module.exports = router;

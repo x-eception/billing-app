@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const sendOtpSMS = require('../utils/sns');
+const jwt = require('jsonwebtoken');
 
 const AWS = require('aws-sdk');
 require('dotenv').config();
@@ -85,9 +86,6 @@ router.post('/register', async (req, res) => {
 
 // routes/adminAuthRoutes.js (append this at the bottom)
 
-
-
-
 router.post('/login', async (req, res) => {
   const { contact, password } = req.body;
 
@@ -107,11 +105,23 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ msg: 'Invalid Contact or Password' });
     }
 
-    res.json({ msg: 'Login successful' });
+    // ✅ Generate JWT token
+    const token = jwt.sign(
+      { contact: result.Item.Contact, role: 'admin' }, // You can add more claims
+      process.env.JWT_SECRET, // Make sure this is set in your `.env`
+      { expiresIn: '7d' }
+    );
+
+    // ✅ Return token in response
+    res.json({
+      msg: 'Login successful',
+      token,
+    });
   } catch (err) {
     console.error('DynamoDB Login Error:', err);
     res.status(500).json({ msg: 'Login failed', error: err.message });
   }
 });
+
 
 module.exports = router;
